@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Structural Fit Lab | Practice Activity</title>
+<style>
+  :root {
+    --ink: #13283a;
+    --ink-2: #3d5163;
+    --muted: #6a7b8a;
+    --line: #dde6ef;
+    --paper: #ffffff;
+    --blue: #0b5394; --blue-t: #deebf8;
+    --teal: #134f5c; --teal-t: #dcecee;
+    --coral: #ff6b4a; --coral-d: #b8401f; --coral-t: #ffe6de;
+    --amber: #f2a516; --amber-d: #8a5a00; --amber-t: #fff1d2;
+    --sea: #13a89e; --sea-d: #0b7a72; --sea-t: #d8f4f1;
+    --fern: #37b24d; --fern-d: #2b8a3e; --fern-t: #dff5e3;
+    --r-xl: 22px; --r-lg: 17px; --r-md: 12px;
+    --shadow: 0 1px 2px rgba(19,40,58,.06), 0 12px 30px rgba(11,83,148,.12);
+    --shadow-hi: 0 3px 8px rgba(19,40,58,.1), 0 20px 40px rgba(11,83,148,.18);
+    --round: "Arial Rounded MT Bold", "Nunito", "Varela Round", "Segoe UI", system-ui, sans-serif;
+    --sans: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--sans); font-size: 16px; line-height: 1.55; color: var(--ink);
+    background-color: #f1f7ff;
+    background-image:
+      radial-gradient(44rem 30rem at -6% -6%, rgba(19,168,158,.42), transparent 62%),
+      radial-gradient(42rem 30rem at 106% 0%, rgba(255,107,74,.42), transparent 60%),
+      radial-gradient(46rem 30rem at 104% 98%, rgba(242,165,22,.48), transparent 62%),
+      radial-gradient(42rem 30rem at -6% 100%, rgba(11,83,148,.32), transparent 60%);
+    min-height: 100vh; overflow-x: hidden; position: relative;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0; opacity: .3;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 18px 16px 44px; }
+  h1, h2, h3, h4 { margin: 0; line-height: 1.2; font-family: var(--round); font-weight: 700; }
+  h1:focus, h2:focus, h3:focus { outline: none; }
+  p { margin: 0; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+  :focus-visible { outline: 3px solid var(--coral); outline-offset: 3px; }
+
+  /* Header */
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .uni b { display: block; font-family: var(--round); font-size: 17px; }
+  .uni span { font-size: 12.5px; color: var(--ink-2); font-weight: 600; }
+  .pa { display: inline-flex; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 10px; background: var(--teal); color: #fff; font-weight: 800; font-size: 13px; }
+  .pa i { display: inline-grid; place-items: center; width: 18px; height: 18px; border-radius: 6px; background: var(--amber); color: var(--teal); font-style: normal; }
+  .pa i svg { width: 12px; height: 12px; }
+
+  /* Scale ladder */
+  .ladder { display: flex; align-items: flex-end; gap: 6px; background: rgba(255,255,255,.8); border-radius: var(--r-xl); padding: 12px 16px; box-shadow: var(--shadow); margin-bottom: 16px; overflow-x: auto; list-style: none; }
+  .ladder li { flex: 1 1 0; min-width: 76px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; position: relative; }
+  .ladder li:not(:last-child)::after { content: ""; position: absolute; right: -6px; bottom: 30px; width: 12px; height: 3px; border-radius: 3px; background: #c9d6e2; }
+  .ladder .dot { border-radius: 50%; display: grid; place-items: center; background: #e5edf5; color: var(--muted); transition: all .3s ease; }
+  .ladder .dot svg { width: 55%; height: 55%; }
+  .ladder small { font-size: 11.5px; font-weight: 800; color: var(--muted); line-height: 1.2; }
+  .ladder li.now .dot { background: linear-gradient(135deg, var(--blue), var(--teal)); color: #fff; box-shadow: 0 0 0 5px rgba(11,83,148,.15); }
+  .ladder li.now small { color: var(--blue); }
+  .ladder li.s .dot { background: var(--fern); color: #fff; } .ladder li.p .dot { background: var(--amber); color: #fff; } .ladder li.w .dot { background: var(--coral); color: #fff; }
+
+  /* Common */
+  .card { background: var(--paper); border-radius: var(--r-xl); box-shadow: var(--shadow); padding: 22px; }
+  .stack { display: flex; flex-direction: column; gap: 16px; }
+  .eyebrow { font-size: 12px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; color: var(--blue); }
+  .h2 { font-size: clamp(23px, 3.3vw, 30px); margin: 6px 0 6px; }
+  .lead { font-size: 16px; color: var(--ink-2); }
+  .hint { font-size: 13.5px; color: var(--muted); }
+  .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  /* Buttons */
+  .btn { appearance: none; border: 0; font: inherit; font-weight: 800; font-size: 15px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 13px 22px; border-radius: 14px; transition: transform .15s ease, box-shadow .15s ease; font-family: var(--round); }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-go { color: #fff; background: linear-gradient(120deg, var(--blue), var(--teal)); box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 10px 20px rgba(11,83,148,.28); }
+  .btn-go:hover:not(:disabled) { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgba(255,255,255,.25), 0 14px 26px rgba(11,83,148,.34); }
+  .btn-go:disabled { background: #c3cfda; box-shadow: none; cursor: not-allowed; }
+  .btn-alt { background: #fff; color: var(--teal); border: 2px solid var(--teal); }
+
+  /* Intro */
+  .hero { position: relative; overflow: hidden; border-radius: var(--r-xl); padding: 32px 30px; color: #fff; box-shadow: var(--shadow);
+    background: radial-gradient(24rem 18rem at 95% 0%, rgba(242,165,22,.85), transparent 60%), radial-gradient(22rem 16rem at 0% 110%, rgba(255,107,74,.75), transparent 60%), linear-gradient(125deg, #083f72 0%, #0b5394 45%, #134f5c 100%); }
+  .hero::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .42; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='h'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23h)'/%3E%3C/svg%3E"); }
+  .hero > * { position: relative; z-index: 1; }
+  .hero .eb { font-size: 12.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; opacity: .92; }
+  .hero h1 { font-size: clamp(32px, 5.2vw, 50px); margin: 10px 0 10px; }
+  .hero p { max-width: 640px; font-size: 16.5px; opacity: .96; }
+  .principle { margin-top: 18px; display: inline-flex; gap: 10px; align-items: flex-start; background: rgba(255,255,255,.95); color: var(--ink); padding: 12px 16px; border-radius: 14px; max-width: 640px; }
+  .principle svg { width: 22px; height: 22px; color: var(--coral); flex-shrink: 0; margin-top: 1px; }
+  .principle b { font-family: var(--round); }
+  .lenses { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+  .lens { border-radius: var(--r-lg); padding: 14px; background: var(--lt); }
+  .lens .li { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--lc); margin-bottom: 8px; }
+  .lens .li svg { width: 19px; height: 19px; }
+  .lens b { display: block; font-family: var(--round); font-size: 15px; color: var(--ld); }
+  .lens span { font-size: 13px; color: var(--ink-2); }
+
+  /* Profile */
+  .profile { display: grid; grid-template-columns: 220px minmax(0,1fr); gap: 0; border-radius: var(--r-xl); overflow: hidden; box-shadow: var(--shadow); background: #fff; }
+  .tagside { padding: 22px 18px; color: #fff; background: linear-gradient(160deg, var(--blue), var(--teal)); position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 10px; }
+  .tagside::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .35; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23t)'/%3E%3C/svg%3E"); }
+  .tagside > * { position: relative; z-index: 1; }
+  .mono { width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center; background: #fff; color: var(--blue); font-family: var(--round); font-size: 24px; font-weight: 700; }
+  .tagside small { font-size: 11.5px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; opacity: .9; }
+  .tagside h2 { font-size: 24px; }
+  .scalebadge { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; padding: 5px 11px; border-radius: 999px; background: var(--amber); color: #3a2600; }
+  .scalebadge svg { width: 15px; height: 15px; }
+  .pbody { padding: 18px 20px; }
+  .pgrid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+  .pf { padding: 10px 12px; border-radius: var(--r-md); background: #f5f9fc; }
+  .pf small { display: block; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .pf b { font-size: 14.5px; font-weight: 700; }
+  .pf.issue { grid-column: 1 / -1; background: var(--coral-t); }
+  .pf.issue small { color: var(--coral-d); }
+  .signs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .sign { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; padding: 5px 10px; border-radius: 999px; background: #fff; border: 1.5px dashed var(--coral); color: var(--coral-d); }
+  .sign svg { width: 14px; height: 14px; }
+
+  /* Context cards */
+  .ctx { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+  .cc { position: relative; border-radius: var(--r-lg); padding: 14px; background: var(--ct); border: 2px solid transparent; transition: border-color .3s ease, box-shadow .3s ease; }
+  .cc .ch { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .cc .ch span { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--cl); flex-shrink: 0; }
+  .cc .ch span svg { width: 16px; height: 16px; }
+  .cc .ch b { font-family: var(--round); font-size: 13.5px; letter-spacing: .05em; text-transform: uppercase; color: var(--cd); }
+  .cc p { font-size: 13.8px; }
+  .cc .q { font-size: 12px; color: var(--muted); font-style: italic; margin-top: 6px; }
+  .cc .stamp { display: none; margin-top: 10px; font-size: 12px; font-weight: 800; padding: 5px 9px; border-radius: 10px; background: #fff; }
+  .cc .stamp b { display: inline-flex; align-items: center; gap: 4px; }
+  .cc .stamp b svg { width: 14px; height: 14px; }
+  .cc .stamp span { display: block; font-weight: 600; color: var(--ink-2); margin-top: 3px; font-size: 12.5px; }
+  .cc .star { display: none; position: absolute; top: -10px; right: 10px; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: var(--ink); color: #fff; }
+  .ctx.judged .stamp { display: block; }
+  .ctx.judged .cc.key { box-shadow: 0 0 0 3px var(--cl); }
+  .ctx.judged .cc.key .star { display: inline-block; }
+  .f-S { color: var(--fern-d); } .f-P { color: var(--amber-d); } .f-W { color: var(--coral-d); }
+
+  /* Decisions */
+  .qline { font-family: var(--round); font-size: 20px; }
+  .decs { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-top: 12px; }
+  .dc { appearance: none; font: inherit; color: inherit; text-align: left; cursor: pointer; border-radius: var(--r-lg); border: 2px solid var(--line); background: #fff; padding: 16px; display: flex; flex-direction: column; gap: 8px; transition: all .15s ease; position: relative; }
+  .dc .dl { display: flex; align-items: center; justify-content: space-between; }
+  .dc .dl span { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; background: var(--blue-t); color: var(--blue); font-family: var(--round); font-weight: 700; }
+  .dc .dl i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #b9c7d4; }
+  .dc h4 { font-size: 16px; }
+  .dc p { font-size: 14px; color: var(--ink-2); }
+  .dc:hover:not(:disabled) { border-color: #9fbedd; box-shadow: var(--shadow-hi); transform: translateY(-2px); }
+  .dc[aria-checked="true"] { border-color: var(--blue); background: #f4f9fe; box-shadow: 0 0 0 4px rgba(11,83,148,.13); }
+  .dc[aria-checked="true"] .dl span { background: var(--blue); color: #fff; }
+  .dc[aria-checked="true"] .dl i { border: 7px solid var(--blue); }
+  .dc:disabled { cursor: default; }
+  .decs.locked .dc:not(.picked):not(.best) { opacity: .5; }
+  .fitlabel { display: none; align-self: flex-start; font-size: 11.5px; font-weight: 800; padding: 3px 10px; border-radius: 999px; }
+  .decs.locked .dc .fitlabel { display: inline-flex; }
+  .fl-S { background: var(--fern-t); color: var(--fern-d); } .fl-P { background: var(--amber-t); color: var(--amber-d); } .fl-W { background: var(--coral-t); color: var(--coral-d); }
+  .decs.locked .dc.best { border-color: var(--fern); }
+  .decs.locked .dc.picked:not(.best) { border-color: var(--coral); background: #fff8f6; box-shadow: none; }
+  .decs.locked .dc.picked:not(.best) .dl i { border-color: var(--coral); }
+
+  /* Impact */
+  .impact { border-radius: var(--r-xl); overflow: hidden; background: #fff; box-shadow: var(--shadow); animation: rise .35s ease; }
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .im-top { padding: 18px 22px; display: grid; grid-template-columns: 50px 1fr; gap: 14px; align-items: center; color: #fff; }
+  .im-top .pz { width: 50px; height: 50px; border-radius: 15px; background: rgba(255,255,255,.22); display: grid; place-items: center; }
+  .im-top .pz svg { width: 28px; height: 28px; }
+  .im-top small { font-size: 12px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; opacity: .95; }
+  .im-top h3 { font-size: 20px; margin-top: 2px; }
+  .im-S { background: linear-gradient(120deg, #1f7a32, #37b24d 55%, #13a89e); }
+  .im-P { background: linear-gradient(120deg, #8a5a00, #d48806 55%, #f2a516); }
+  .im-W { background: linear-gradient(120deg, #a33417, #e0532f 55%, #ff6b4a); }
+  .im-body { padding: 18px 22px 22px; display: grid; gap: 14px; }
+  .twin { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tw { border-radius: var(--r-lg); padding: 14px; }
+  .tw h4 { font-family: var(--sans); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; display: flex; gap: 6px; align-items: center; margin-bottom: 4px; }
+  .tw h4 svg { width: 16px; height: 16px; }
+  .tw p { font-size: 14.8px; }
+  .tw-g { background: var(--fern-t); } .tw-g h4 { color: var(--fern-d); }
+  .tw-r { background: var(--coral-t); } .tw-r h4 { color: var(--coral-d); }
+  .whyfit h4 { font-family: var(--sans); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+  .whyfit p { font-size: 15.3px; }
+  .keyf { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .keyf span { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 800; padding: 4px 10px; border-radius: 999px; color: #fff; }
+  .keyf svg { width: 13px; height: 13px; }
+  .better { font-size: 14.5px; padding: 12px 14px; border-radius: var(--r-md); background: var(--fern-t); }
+  .better b { color: var(--fern-d); }
+
+  /* Transfer */
+  .vs { display: grid; grid-template-columns: 1fr 52px 1fr; gap: 0; align-items: stretch; }
+  .biz { border-radius: var(--r-xl); padding: 18px; background: #fff; box-shadow: var(--shadow); border-top: 6px solid var(--bc); }
+  .biz h3 { font-size: 19px; display: flex; align-items: center; gap: 8px; }
+  .biz h3 span { width: 34px; height: 34px; border-radius: 11px; display: grid; place-items: center; color: #fff; background: var(--bc); }
+  .biz h3 span svg { width: 19px; height: 19px; }
+  .biz ul { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 6px; }
+  .biz li { display: flex; gap: 8px; align-items: center; font-size: 14.5px; padding: 7px 10px; border-radius: 10px; background: #f5f9fc; }
+  .biz li.diff { background: var(--bt); font-weight: 700; }
+  .biz li svg { width: 15px; height: 15px; color: var(--bc); flex-shrink: 0; }
+  .vsmid { display: grid; place-items: center; }
+  .vsmid span { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: #fff; font-family: var(--round); font-weight: 700; font-size: 14px; }
+
+  /* Final */
+  .final-head { position: relative; overflow: hidden; border-radius: var(--r-xl); padding: 26px; color: #fff; box-shadow: var(--shadow); }
+  .final-head::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .4; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E"); }
+  .final-head > * { position: relative; z-index: 1; }
+  .fh-S { background: radial-gradient(20rem 14rem at 100% 0%, rgba(242,165,22,.7), transparent 60%), linear-gradient(120deg, #0b5394, #13a89e 60%, #37b24d); }
+  .fh-P { background: radial-gradient(20rem 14rem at 100% 0%, rgba(19,168,158,.6), transparent 60%), linear-gradient(120deg, #0b5394, #134f5c 50%, #d48806); }
+  .fh-W { background: radial-gradient(20rem 14rem at 100% 0%, rgba(242,165,22,.6), transparent 60%), linear-gradient(120deg, #134f5c, #b8401f 60%, #ff6b4a); }
+  .final-head small { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; opacity: .92; }
+  .final-head h1 { font-size: clamp(26px, 4vw, 38px); margin: 8px 0; }
+  .final-head p { font-size: 16px; max-width: 760px; opacity: .97; }
+  .areas { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+  .area { border-radius: var(--r-xl); padding: 16px; background: #fff; box-shadow: var(--shadow); border-top: 6px solid var(--ac); }
+  .area .ah { display: flex; align-items: center; gap: 8px; }
+  .area .ah span { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; color: #fff; background: var(--ac); }
+  .area .ah span svg { width: 17px; height: 17px; }
+  .area b { font-family: var(--round); font-size: 15px; }
+  .pieces { display: flex; gap: 6px; margin: 12px 0 8px; }
+  .pieces i { width: 26px; height: 26px; color: #d3dde7; }
+  .pieces i.on { color: var(--ac); }
+  .pieces svg { width: 100%; height: 100%; }
+  .area .lv { display: inline-block; font-size: 12px; font-weight: 800; padding: 3px 10px; border-radius: 999px; }
+  .pattern ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; font-size: 15px; }
+  .recap { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+  .rc { border-radius: var(--r-md); padding: 12px; background: #f5f9fc; }
+  .rc small { font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+  .rc b { display: block; font-size: 14px; margin: 3px 0 8px; }
+  .rc em { font-style: normal; font-size: 11.5px; font-weight: 800; padding: 2px 9px; border-radius: 999px; }
+  .closing { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: var(--r-lg); background: linear-gradient(120deg, var(--blue-t), var(--sea-t)); font-size: 15.5px; }
+  .closing svg { width: 24px; height: 24px; color: var(--blue); flex-shrink: 0; }
+  .closing b { font-family: var(--round); }
+
+  .foot { text-align: center; font-size: 12.5px; color: var(--ink-2); margin-top: 22px; }
+
+  @media (max-width: 940px) {
+    .ctx, .lenses, .areas { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .decs { grid-template-columns: minmax(0,1fr); }
+    .recap { grid-template-columns: 1fr 1fr; }
+    .profile { grid-template-columns: minmax(0,1fr); }
+    .tagside { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  }
+  @media (max-width: 640px) {
+    .card { padding: 18px; }
+    .hero { padding: 26px 20px; }
+    .pgrid, .twin, .ctx, .lenses, .recap { grid-template-columns: minmax(0,1fr); }
+    .vs { grid-template-columns: minmax(0,1fr); }
+    .vsmid { padding: 8px 0; }
+    .row .btn { width: 100%; }
+    .im-top, .im-body { padding-left: 16px; padding-right: 16px; }
+    .ladder { padding: 10px; }
+  }
+  @media (max-width: 460px) { .areas { grid-template-columns: minmax(0,1fr); } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="uni"><b>Nexford University</b><span>BUS2125 The World of Business &middot; Section 4: Structure and Business Objectives</span></div>
+    <span class="pa"><i aria-hidden="true" id="paI"></i>Practice Activity</span>
+  </header>
+  <nav aria-label="Activity progress"><ol class="ladder" id="ladder"></ol></nav>
+  <main id="app"></main>
+  <p class="sr" id="live" aria-live="polite"></p>
+  <p class="foot">Practice Activity &middot; Ungraded &middot; Nexford University</p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============ Icons ============ */
+  var P = {
+    puzzle: '<path d="M5 7h3.2a2.3 2.3 0 1 1 4.6 0H16v3.2a2.3 2.3 0 1 1 0 4.6V18H5v-3.2a2.3 2.3 0 1 0 0-4.6z"/>',
+    puzzleHalf: '<path d="M5 7h3.2a2.3 2.3 0 1 1 4.6 0H16v3.2a2.3 2.3 0 1 1 0 4.6V18H5v-3.2a2.3 2.3 0 1 0 0-4.6z"/><path d="M10.5 7v11" stroke-dasharray="2 2"/>',
+    puzzleBreak: '<path d="M5 7h3.2a2.3 2.3 0 1 1 4.6 0H14l-2 4 3 3-2 4H5v-3.2a2.3 2.3 0 1 0 0-4.6z"/><path d="M17 9l2 3-2 3 1.5 3"/>',
+    aim: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="M21.5 2.5l-7 7"/><path d="M17.5 2.5h4v4"/>',
+    blocks: '<rect x="3" y="14" width="6" height="6" rx="1.2"/><rect x="10" y="10" width="5" height="10" rx="1.2"/><rect x="16" y="5" width="5" height="15" rx="1.2"/>',
+    toolbox: '<rect x="3" y="8.5" width="18" height="11" rx="2"/><path d="M8.5 8.5V6a1.5 1.5 0 0 1 1.5-1.5h4A1.5 1.5 0 0 1 15.5 6v2.5"/><path d="M3 13h18"/><path d="M10 13v2h4v-2"/>',
+    map: '<path d="M3 6.5l6-2.5 6 2.5 6-2.5v13.5l-6 2.5-6-2.5-6 2.5z"/><path d="M9 4v13.5"/><path d="M15 6.5V20"/>',
+    shop: '<path d="M4 9.5l1.5-5h13l1.5 5"/><path d="M4 9.5a2.7 2.7 0 0 0 5.3 0 2.7 2.7 0 0 0 5.4 0 2.7 2.7 0 0 0 5.3 0"/><path d="M5.5 11.5V20h13v-8.5"/><path d="M10 20v-4.5h4V20"/>',
+    office: '<rect x="5" y="3.5" width="14" height="17" rx="1.5"/><path d="M9 7.5h2"/><path d="M13 7.5h2"/><path d="M9 11h2"/><path d="M13 11h2"/><path d="M9 14.5h2"/><path d="M13 14.5h2"/><path d="M10.5 20.5v-3h3v3"/>',
+    globe: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.5 2.4 3.8 5.2 3.8 8.5s-1.3 6.1-3.8 8.5c-2.5-2.4-3.8-5.2-3.8-8.5S9.5 5.9 12 3.5z"/>',
+    twin: '<rect x="3" y="7" width="7" height="13" rx="1.2"/><rect x="14" y="4" width="7" height="16" rx="1.2"/><path d="M5.5 11h2"/><path d="M5.5 14.5h2"/><path d="M16.5 8h2"/><path d="M16.5 11.5h2"/><path d="M16.5 15h2"/>',
+    warn: '<path d="M12 4l9 15.5H3z"/><path d="M12 10v4"/><path d="M12 17h.01"/>',
+    up: '<path d="M12 19V5"/><path d="M6 11l6-6 6 6"/>',
+    risk: '<path d="M12 5v14"/><path d="M6 13l6 6 6-6"/>',
+    dot: '<circle cx="12" cy="12" r="3"/>',
+    star: '<path d="M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/>',
+    bulb: '<path d="M9 18h6"/><path d="M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>',
+    arrow: '<path d="M5 12h14"/><path d="M13 6l6 6-6 6"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    restart: '<path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/>'
+  };
+  function ic(n) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' + P[n] + '</svg>'; }
+  document.getElementById("paI").innerHTML = ic("puzzle");
+
+  var F = [
+    { k: "obj", n: "Objective", icon: "aim", c: "var(--blue)", d: "var(--blue)", t: "var(--blue-t)", q: "What is the business trying to achieve?" },
+    { k: "scale", n: "Scale", icon: "blocks", c: "var(--coral)", d: "var(--coral-d)", t: "var(--coral-t)", q: "How much complexity does it currently need?" },
+    { k: "res", n: "Resources", icon: "toolbox", c: "var(--amber)", d: "var(--amber-d)", t: "var(--amber-t)", q: "What people, expertise, money, and management capacity exist?" },
+    { k: "env", n: "Environment", icon: "map", c: "var(--sea)", d: "var(--sea-d)", t: "var(--sea-t)", q: "What conditions affect how the business needs to work?" }
+  ];
+  var FITW = { S: "Strong Fit", P: "Partial Fit", W: "Weak Fit" };
+  var FITS = { S: "Fits", P: "Partly fits", W: "Does not fit" };
+  var FITI = { S: "puzzle", P: "puzzleHalf", W: "puzzleBreak" };
+
+  /* ============ Cases ============ */
+  var CASES = [
+    {
+      name: "Oak & Field", mono: "OF", scaleLbl: "Small business", scaleIcon: "shop",
+      profile: [["Business scale", "Small business, one location"], ["Employees", "18"], ["Current objective", "Increase order capacity without creating unnecessary overhead"], ["Available resources", "A small team with broad skills; limited budget for new management positions"], ["Operating environment", "Growing local customer base and rising order volume"]],
+      issue: "As orders grow, the owner is pulled into too many routine decisions.",
+      signs: ["Owner signs off on routine order changes daily", "Staff wait for owner approval"],
+      ctx: { obj: "Increase order capacity without unnecessary overhead.", scale: "18 people, one location, broad roles, direct communication.", res: "Limited budget for added managers; owner involved in major decisions.", env: "A growing local customer base is raising order volume." },
+      key: ["scale", "res"],
+      q: "Which structural response provides the strongest fit?",
+      best: 2,
+      opts: [
+        { t: "Build specialized departments", d: "Create separate departments for orders, purchasing, and customer care, each with its own manager reporting to the owner.", tag: "complex",
+          fit: { obj: ["W", "New overhead works against the objective."], scale: ["W", "Too many layers for 18 people."], res: ["W", "Exceeds the budget for management roles."], env: ["P", "One local site does not require separate departments."] }, overall: "W",
+          gain: "Creates clear specialist roles for each area of work.",
+          risk: "Adds management salaries and reporting layers the business cannot easily support, and may slow communication that is currently direct.",
+          why: "The growth problem is real, but this solves it with more complexity than the scale and resources justify. Adding layers also does not directly take routine decisions away from the owner." },
+        { t: "Keep everything as it is", d: "Leave every responsibility and approval unchanged, because small businesses work best when they stay simple.", tag: "central",
+          fit: { obj: ["W", "Order capacity cannot keep pace."], scale: ["P", "Simplicity suits the size, but workload has grown."], res: ["S", "No added cost."], env: ["W", "Rising local demand is not addressed."] }, overall: "P",
+          gain: "Keeps the business simple, flexible, and low-cost.",
+          risk: "The owner remains a bottleneck for routine decisions, so order capacity cannot keep up with growth.",
+          why: "Simplicity suits a small business, but the recurring pattern of the owner handling routine issues shows the current arrangement no longer fits the objective." },
+        { t: "Clarify and delegate selectively", d: "Clarify who handles what, let experienced staff make selected routine decisions within set limits, and add specialization only where workload clearly justifies it.", tag: "fit",
+          fit: { obj: ["S", "Frees capacity without new overhead."], scale: ["S", "Keeps the structure suited to 18 people."], res: ["S", "Uses existing people within the budget."], env: ["S", "Responds to rising local demand."] }, overall: "S",
+          gain: "Routine decisions move to the people doing the work, and the owner focuses on major decisions.",
+          risk: "Requires clear limits and some training, and a few broad roles become more specialized.",
+          why: "It responds to demonstrated growth needs while respecting the small scale and limited budget. Broad roles stay where they still work, and specialization is added only where workload justifies it." }
+      ]
+    },
+    {
+      name: "Crestwell Home", mono: "CH", scaleLbl: "Medium-sized business", scaleIcon: "office",
+      profile: [["Business scale", "Medium-sized, national sales"], ["Employees", "About 240"], ["Current objective", "Support continued national growth while improving decision speed"], ["Available resources", "Dedicated functional teams led by managers with relevant expertise"], ["Operating environment", "Selling nationally, with approval delays increasing"]],
+      issue: "Specialized functions exist, but senior leadership still approves many routine functional decisions.",
+      signs: ["Repeated approval delays", "Senior leaders handling routine issues"],
+      ctx: { obj: "Support national growth while improving decision speed.", scale: "About 240 employees with dedicated functional teams.", res: "Experienced functional managers who have limited authority.", env: "A national market where approval delays are growing." },
+      key: ["scale", "obj"],
+      q: "Which structural response provides the strongest fit?",
+      best: 1,
+      opts: [
+        { t: "Keep authority central", d: "Keep routine approvals with senior leadership to maintain maximum control while the company grows.", tag: "central",
+          fit: { obj: ["W", "Decision speed keeps falling."], scale: ["W", "Central control no longer suits 240 people."], res: ["P", "Manager expertise goes unused."], env: ["P", "National growth adds more approvals."] }, overall: "W",
+          gain: "Leadership keeps tight control over every routine decision.",
+          risk: "Approval delays keep growing, and experienced managers' expertise goes unused.",
+          why: "Central control may have suited the business when it was smaller. With 240 employees and specialized teams, it now creates bottlenecks that work against decision speed." },
+        { t: "Delegate within limits", d: "Give functional managers authority over routine decisions within defined limits, while senior leadership keeps oversight of major decisions.", tag: "fit",
+          fit: { obj: ["S", "Faster decisions support growth."], scale: ["S", "Matches the size and specialization."], res: ["S", "Uses managers' expertise."], env: ["S", "Keeps national consistency on major decisions."] }, overall: "S",
+          gain: "Routine decisions are made by managers with the relevant expertise, so approvals move faster.",
+          risk: "Leadership must set clear limits and still review significant decisions.",
+          why: "The company's scale and specialization justify more delegated authority, while organization-wide oversight remains for significant decisions." },
+        { t: "Let functions operate independently", d: "Remove most senior oversight and let each function run its own decisions and priorities.", tag: "independent",
+          fit: { obj: ["P", "Faster, but growth may become uncoordinated."], scale: ["P", "Specialization exists, but functions must still work together."], res: ["S", "Uses managers' expertise fully."], env: ["W", "National consistency becomes harder."] }, overall: "P",
+          gain: "Functions decide quickly without waiting for senior approval.",
+          risk: "Functions may chase their own results, producing strong departmental results but weaker overall business results and inconsistent decisions.",
+          why: "Speed improves, but removing most oversight goes further than the problem requires and weakens coordination across a national business." }
+      ]
+    },
+    {
+      name: "Aster Global Products", mono: "AG", scaleLbl: "Multinational enterprise", scaleIcon: "globe",
+      profile: [["Business scale", "Multinational enterprise"], ["Employees", "Teams in the United States and several international markets"], ["Current objective", "Expand internationally while maintaining consistency and local responsiveness"], ["Available resources", "Specialized functional teams and local managers with market knowledge"], ["Operating environment", "Regional differences in customers, suppliers, staffing, and market conditions"]],
+      issue: "Leadership must decide which decisions stay central and which are handled locally.",
+      signs: ["Central policies creating problems in different markets", "Local teams waiting on headquarters"],
+      ctx: { obj: "Expand internationally with consistency and local responsiveness.", scale: "U.S. and several international markets; specialized teams.", res: "Local managers with market knowledge; company-wide financial and brand standards.", env: "Customers, suppliers, staffing, and markets differ by region." },
+      key: ["env", "obj"],
+      q: "Which structural response provides the strongest fit?",
+      best: 2,
+      opts: [
+        { t: "Centralize nearly everything", d: "Require headquarters to approve nearly all operational and market decisions in every country.", tag: "central",
+          fit: { obj: ["W", "Consistent, but not responsive."], scale: ["P", "Hard to run so much from one place."], res: ["P", "Local market knowledge goes unused."], env: ["W", "Regional differences are ignored."] }, overall: "W",
+          gain: "Strong consistency of financial and brand standards.",
+          risk: "Local teams wait on headquarters, and central policies keep creating problems in different markets.",
+          why: "Centralizing nearly everything protects consistency but makes local operations slow and poorly adapted to local conditions." },
+        { t: "Let each country operate independently", d: "Allow each country operation to set its own standards and run largely on its own.", tag: "independent",
+          fit: { obj: ["P", "Responsive, but not consistent."], scale: ["P", "Specialized teams are duplicated across countries."], res: ["W", "Duplicated work wastes resources."], env: ["S", "Fully adapted to local conditions."] }, overall: "P",
+          gain: "Local teams respond quickly to their own markets.",
+          risk: "Duplicated work, inconsistent standards, and weaker organization-wide control of finances and brand.",
+          why: "Responsiveness improves, but the objective also requires organization-wide consistency." },
+        { t: "Balance central and local decisions", d: "Keep major investments, financial standards, and brand requirements central, while local teams decide on market-dependent matters such as local suppliers, staffing, and offers.", tag: "fit",
+          fit: { obj: ["S", "Delivers consistency and responsiveness."], scale: ["S", "Matches multinational complexity."], res: ["S", "Uses both central standards and local knowledge."], env: ["S", "Local teams adapt to regional differences."] }, overall: "S",
+          gain: "Consistent standards where they matter and fast local decisions where markets differ.",
+          risk: "Leadership must clearly define which decisions belong where and revisit the balance as markets change.",
+          why: "The right balance depends on the nature of each decision. This arrangement keeps organization-wide consistency for major decisions and local responsiveness for market-dependent ones." }
+      ]
+    }
+  ];
+
+  var TRANSFER = {
+    q: "Should these businesses automatically use the same structural arrangement because they are similar in size?",
+    best: 1,
+    opts: [
+      { t: "Yes, same size, same structure", d: "With the same number of employees, using the same arrangement keeps both businesses comparable and efficient.", tag: "sizeonly",
+        fit: { obj: ["P", ""], scale: ["W", ""], res: ["P", ""], env: ["W", ""] }, overall: "W",
+        fb: "Employee count alone does not determine structural needs. Business B's regional variation calls for a different arrangement than Business A's predictable, single-location operation." },
+      { t: "Not automatically", d: "Size is only one factor. Each should be organized around its own objectives, resources, and operating environment, so B may need more local flexibility while A may work well with a simpler, more centralized arrangement.", tag: "fit",
+        fit: { obj: ["S", ""], scale: ["S", ""], res: ["S", ""], env: ["S", ""] }, overall: "S",
+        fb: "Businesses of similar size can need different arrangements because their markets, supplier conditions, and operating environments differ. Fit depends on context, not headcount." },
+      { t: "No, B needs more layers", d: "Business B should add more departments and management layers because it is the more complex business.", tag: "complex",
+        fit: { obj: ["P", ""], scale: ["P", ""], res: ["W", ""], env: ["P", ""] }, overall: "P",
+        fb: "You recognized the different environments, but more layers are not automatically the answer. Business B's regional variation may call for more local flexibility, not necessarily more complexity, and the change must fit its resources." }
+    ]
+  };
+
+  /* ============ State ============ */
+  var S;
+  function reset() { S = { view: 0, sel: null, locked: false, picks: [null, null, null, null] }; }
+  var app = document.getElementById("app");
+  function say(t) { document.getElementById("live").textContent = t; }
+  function pickedFit(i) { var p = S.picks[i]; if (p === null) return null; return (i < 3 ? CASES[i].opts[p] : TRANSFER.opts[p]); }
+
+  /* ============ Ladder ============ */
+  function renderLadder() {
+    var items = [["Briefing", "bulb", 22], ["Oak & Field", "shop", 28], ["Crestwell Home", "office", 36], ["Aster Global", "globe", 44], ["Transfer", "twin", 34], ["Fit review", "star", 30]];
+    document.getElementById("ladder").innerHTML = items.map(function (it, i) {
+      var cls = "";
+      if (i === S.view) cls = "now";
+      else if (i >= 1 && i <= 4 && S.picks[i - 1] !== null) cls = pickedFit(i - 1).overall.toLowerCase();
+      return '<li class="' + cls + '"' + (i === S.view ? ' aria-current="step"' : '') + '><span class="dot" style="width:' + it[2] + 'px;height:' + it[2] + 'px">' + ic(it[1]) + '</span><small>' + it[0] + '</small></li>';
+    }).join("");
+  }
+
+  /* ============ Intro ============ */
+  function renderIntro() {
+    app.innerHTML = '<div class="stack">' +
+      '<section class="hero">' +
+        '<div class="eb">Section 4 &middot; Structure and Business Objectives</div>' +
+        '<h1 tabindex="-1" id="title">Structural Fit Lab</h1>' +
+        '<p>You will advise three businesses facing different structural challenges. Review each company\'s objective, scale, resources, and operating environment before recommending a response.</p>' +
+        '<div class="principle">' + ic("puzzle") + '<span><b>Fit, not complexity.</b> The strongest structure is the one that fits the organization\'s objectives, scale, resources, and operating environment.</span></div>' +
+      '</section>' +
+      '<section class="card"><div class="eyebrow" style="margin-bottom:10px">Your four lenses</div><div class="lenses">' +
+        F.map(function (f) { return '<div class="lens" style="--lc:' + f.c + ';--lt:' + f.t + ';--ld:' + f.d + '"><span class="li">' + ic(f.icon) + '</span><b>' + f.n + '</b><span>' + f.q + '</span></div>'; }).join("") +
+      '</div></section>' +
+      '<section class="card"><div class="row"><span class="hint">3 companies plus a transfer challenge &middot; about 8 minutes &middot; ungraded &middot; one attempt per recommendation</span><button class="btn btn-go" id="start" type="button">Open the first business ' + ic("arrow") + '</button></div></section>' +
+    '</div>';
+    document.getElementById("start").addEventListener("click", function () { go(1); });
+  }
+
+  /* ============ Case ============ */
+  function decCards(opts, idPrefix) {
+    return opts.map(function (o, i) {
+      return '<button type="button" class="dc" role="radio" aria-checked="false" data-i="' + i + '" tabindex="' + (i === 0 ? 0 : -1) + '">' +
+        '<span class="dl"><span>' + "ABC".charAt(i) + '</span><i aria-hidden="true"></i></span>' +
+        '<span class="fitlabel fl-' + o.overall + '">' + FITW[o.overall] + '</span>' +
+        '<h4>' + o.t + '</h4><p>' + o.d + '</p></button>';
+    }).join("");
+  }
+  function bindDecs(onConfirm) {
+    var bs = app.querySelectorAll(".dc");
+    function pick(i) {
+      if (S.locked) return;
+      S.sel = i;
+      Array.prototype.forEach.call(bs, function (b, j) { b.setAttribute("aria-checked", j === i ? "true" : "false"); b.setAttribute("tabindex", j === i ? "0" : "-1"); });
+      document.getElementById("confirm").disabled = false;
+    }
+    Array.prototype.forEach.call(bs, function (b, idx) {
+      b.addEventListener("click", function () { pick(idx); });
+      b.addEventListener("keydown", function (e) {
+        var n = null;
+        if (e.key === "ArrowDown" || e.key === "ArrowRight") n = (idx + 1) % bs.length;
+        if (e.key === "ArrowUp" || e.key === "ArrowLeft") n = (idx - 1 + bs.length) % bs.length;
+        if (n !== null && !S.locked) { e.preventDefault(); pick(n); bs[n].focus(); }
+      });
+    });
+    document.getElementById("confirm").addEventListener("click", onConfirm);
+  }
+  function lockDecs(best) {
+    var wrap = document.getElementById("decs");
+    wrap.classList.add("locked");
+    Array.prototype.forEach.call(wrap.querySelectorAll(".dc"), function (b, j) {
+      b.disabled = true;
+      if (j === S.sel) b.classList.add("picked");
+      if (j === best) b.classList.add("best");
+    });
+    var c = document.getElementById("confirm"); c.parentNode.removeChild(c);
+  }
+
+  function renderCase() {
+    var ci = S.view - 1, C = CASES[ci];
+    app.innerHTML = '<div class="stack">' +
+      '<section class="profile" aria-labelledby="title">' +
+        '<div class="tagside"><span class="mono" aria-hidden="true">' + C.mono + '</span><div><small>Business ' + (ci + 1) + ' of 3 &middot; Business profile</small><h2 tabindex="-1" id="title">' + C.name + '</h2></div><span class="scalebadge">' + ic(C.scaleIcon) + C.scaleLbl + '</span></div>' +
+        '<div class="pbody"><div class="pgrid">' +
+          C.profile.map(function (p) { return '<div class="pf"><small>' + p[0] + '</small><b>' + p[1] + '</b></div>'; }).join("") +
+          '<div class="pf issue"><small>Current structural issue</small><b>' + C.issue + '</b><div class="signs">' + C.signs.map(function (s) { return '<span class="sign">' + ic("warn") + s + '</span>'; }).join("") + '</div></div>' +
+        '</div></div>' +
+      '</section>' +
+      '<section class="card"><div class="eyebrow" style="margin-bottom:10px">Context analysis</div><div class="ctx" id="ctx">' +
+        F.map(function (f) {
+          return '<div class="cc" id="cc-' + f.k + '" style="--cl:' + f.c + ';--ct:' + f.t + ';--cd:' + f.d + '"><span class="star">Key factor</span><div class="ch"><span>' + ic(f.icon) + '</span><b>' + f.n + '</b></div><p>' + C.ctx[f.k] + '</p><p class="q">' + f.q + '</p><div class="stamp" id="st-' + f.k + '"></div></div>';
+        }).join("") +
+      '</div></section>' +
+      '<section class="card"><div class="eyebrow">Your recommendation</div><p class="qline" id="q" style="margin-top:4px">' + C.q + '</p><p class="hint">Use the context cards as your evidence. One attempt.</p>' +
+        '<div class="decs" id="decs" role="radiogroup" aria-labelledby="q">' + decCards(C.opts) + '</div>' +
+        '<div class="row" style="margin-top:16px"><span class="hint" id="hint">Your recommendation is recorded when you confirm.</span><button class="btn btn-go" id="confirm" type="button" disabled>Confirm recommendation ' + ic("check") + '</button></div>' +
+      '</section>' +
+      '<div id="impact"></div>' +
+    '</div>';
+    bindDecs(confirmCase);
+  }
+
+  function confirmCase() {
+    if (S.locked || S.sel === null) return;
+    var ci = S.view - 1, C = CASES[ci], o = C.opts[S.sel];
+    S.locked = true; S.picks[ci] = S.sel;
+    lockDecs(C.best);
+    document.getElementById("hint").textContent = o.overall === "S" ? "Recorded as the strongest fit." : "Recorded as incorrect. The review continues.";
+    document.getElementById("ctx").classList.add("judged");
+    F.forEach(function (f) {
+      var v = o.fit[f.k];
+      document.getElementById("st-" + f.k).innerHTML = '<b class="f-' + v[0] + '">' + ic(FITI[v[0]]) + FITS[v[0]] + '</b><span>' + v[1] + '</span>';
+      if (C.key.indexOf(f.k) > -1) document.getElementById("cc-" + f.k).classList.add("key");
+    });
+    renderLadder();
+    var best = C.opts[C.best];
+    var keyChips = C.key.map(function (k) { var f = F.filter(function (x) { return x.k === k; })[0]; return '<span style="background:' + f.c + '">' + ic(f.icon) + f.n + '</span>'; }).join("");
+    var next = ci < 2 ? "Next business" : "Open the transfer challenge";
+    document.getElementById("impact").innerHTML =
+      '<section class="impact" aria-labelledby="imT">' +
+        '<div class="im-top im-' + o.overall + '"><span class="pz">' + ic(FITI[o.overall]) + '</span><div><small>Business impact &middot; ' + FITW[o.overall] + (o.overall === "S" ? "" : " &middot; recorded as incorrect") + '</small><h3 tabindex="-1" id="imT">' + o.t + '</h3></div></div>' +
+        '<div class="im-body">' +
+          '<div class="twin"><div class="tw tw-g"><h4>' + ic("up") + 'What it improves</h4><p>' + o.gain + '</p></div><div class="tw tw-r"><h4>' + ic("risk") + 'What problem it may create</h4><p>' + o.risk + '</p></div></div>' +
+          '<div class="whyfit"><h4>Why it ' + (o.overall === "S" ? "fits" : "does not fully fit") + ' ' + C.name + '</h4><p>' + o.why + '</p><div class="keyf"><span style="background:var(--ink)">' + ic("star") + 'Most important factors</span>' + keyChips + '</div></div>' +
+          (o.overall === "S" ? "" : '<div class="better">The strongest fit was <b>' + "ABC".charAt(C.best) + ': ' + best.t + '</b>. ' + best.why + '</div>') +
+          '<div class="row"><span class="hint">The context cards above now show how this recommendation fits each factor.</span><button class="btn btn-go" id="next" type="button">' + next + ' ' + ic("arrow") + '</button></div>' +
+        '</div>' +
+      '</section>';
+    document.getElementById("next").addEventListener("click", function () { go(S.view + 1); });
+    var t = document.getElementById("ctx");
+    try { t.scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) { t.scrollIntoView(); }
+    var h = document.getElementById("imT"); try { h.focus({ preventScroll: true }); } catch (e2) { h.focus(); }
+    say(FITW[o.overall] + " recorded.");
+  }
+
+  /* ============ Transfer ============ */
+  function renderTransfer() {
+    var T = TRANSFER;
+    app.innerHTML = '<div class="stack">' +
+      '<section class="card"><div class="eyebrow">Transfer challenge</div><h2 class="h2" tabindex="-1" id="title">Same size, different context</h2><p class="lead">Two businesses have about the same number of employees. Compare their conditions.</p></section>' +
+      '<div class="vs">' +
+        '<section class="biz" style="--bc:var(--blue);--bt:var(--blue-t)"><h3><span>' + ic("office") + '</span>Business A</h3><ul>' +
+          '<li>' + ic("dot") + '150 employees</li><li class="diff">' + ic("dot") + 'One location</li><li class="diff">' + ic("dot") + 'Stable supplier network</li><li class="diff">' + ic("dot") + 'One national market</li><li class="diff">' + ic("dot") + 'Relatively predictable demand</li></ul></section>' +
+        '<div class="vsmid" aria-hidden="true"><span>vs</span></div>' +
+        '<section class="biz" style="--bc:var(--sea);--bt:var(--sea-t)"><h3><span>' + ic("map") + '</span>Business B</h3><ul>' +
+          '<li>' + ic("dot") + '150 employees</li><li class="diff">' + ic("dot") + 'Several regional locations</li><li class="diff">' + ic("dot") + 'Different supplier conditions</li><li class="diff">' + ic("dot") + 'Different customer needs across regions</li><li class="diff">' + ic("dot") + 'Greater operational variation</li></ul></section>' +
+      '</div>' +
+      '<section class="card"><p class="qline" id="q">' + T.q + '</p><p class="hint">One attempt.</p>' +
+        '<div class="decs" id="decs" role="radiogroup" aria-labelledby="q">' + decCards(T.opts) + '</div>' +
+        '<div class="row" style="margin-top:16px"><span class="hint" id="hint">Your answer is recorded when you confirm.</span><button class="btn btn-go" id="confirm" type="button" disabled>Confirm answer ' + ic("check") + '</button></div>' +
+      '</section>' +
+      '<div id="impact"></div>' +
+    '</div>';
+    bindDecs(confirmTransfer);
+  }
+  function confirmTransfer() {
+    if (S.locked || S.sel === null) return;
+    var T = TRANSFER, o = T.opts[S.sel];
+    S.locked = true; S.picks[3] = S.sel;
+    lockDecs(T.best);
+    document.getElementById("hint").textContent = o.overall === "S" ? "Recorded as the strongest answer." : "Recorded as incorrect.";
+    renderLadder();
+    document.getElementById("impact").innerHTML =
+      '<section class="impact" aria-labelledby="imT">' +
+        '<div class="im-top im-' + o.overall + '"><span class="pz">' + ic(FITI[o.overall]) + '</span><div><small>' + FITW[o.overall] + (o.overall === "S" ? "" : " &middot; recorded as incorrect") + '</small><h3 tabindex="-1" id="imT">' + o.t + '</h3></div></div>' +
+        '<div class="im-body"><div class="whyfit"><p>' + o.fb + '</p></div>' +
+          (o.overall === "S" ? "" : '<div class="better">The strongest answer was <b>B: Not automatically</b>. Employee count alone does not determine structural needs; operating environment, resources, objectives, and complexity also matter.</div>') +
+          '<div class="row"><span class="hint">Answer recorded.</span><button class="btn btn-go" id="next" type="button">See your structural fit review ' + ic("arrow") + '</button></div>' +
+        '</div></section>';
+    document.getElementById("next").addEventListener("click", function () { go(5); });
+    var h = document.getElementById("imT");
+    try { document.getElementById("impact").scrollIntoView({ behavior: "smooth", block: "start" }); } catch (e) {}
+    try { h.focus({ preventScroll: true }); } catch (e2) { h.focus(); }
+  }
+
+  /* ============ Final ============ */
+  function renderFinal() {
+    var pts = { obj: 0, scale: 0, res: 0, env: 0 }, strong = 0, weak = 0, tags = {};
+    var all = [0, 1, 2, 3].map(pickedFit);
+    all.forEach(function (o) {
+      F.forEach(function (f) { var v = o.fit[f.k][0]; pts[f.k] += v === "S" ? 2 : (v === "P" ? 1 : 0); });
+      if (o.overall === "S") strong++;
+      if (o.overall === "W") weak++;
+      tags[o.tag] = (tags[o.tag] || 0) + 1;
+    });
+    var cat = strong === 4 ? ["Strong Structural Assessment", "fh-S", "You consistently matched structural decisions to business context."]
+      : (strong >= 2 || weak === 0) ? ["Developing Structural Assessment", "fh-P", "You considered some contextual factors but occasionally prioritized one factor too heavily."]
+      : ["Structural Fit Needs Reassessment", "fh-W", "You frequently selected arrangements that were unnecessarily complex, too centralized, or poorly suited to the business context."];
+    var names = { obj: "Objective Fit", scale: "Scale Fit", res: "Resource Fit", env: "Environment Fit" };
+    var notes = {
+      obj: ["Your recommendations supported what each business was trying to achieve.", "Some recommendations protected one priority, such as control or simplicity, at the expense of the stated objective."],
+      scale: ["You matched the amount of structure to each business's size and complexity.", "Some recommendations added or kept structure that did not match the business's current scale."],
+      res: ["You respected the people, expertise, budget, and management capacity each business had.", "Some recommendations required resources the business lacked or left available expertise unused."],
+      env: ["You adapted authority and flexibility to each operating environment.", "Some recommendations did not account for differences in markets, suppliers, or regions."]
+    };
+    var areas = F.map(function (f) {
+      var v = pts[f.k], lvl = v >= 7 ? "S" : (v >= 4 ? "P" : "W");
+      var pieces = ""; for (var i = 0; i < 4; i++) pieces += '<i class="' + (i < Math.round(v / 2) ? "on" : "") + '">' + ic("puzzle") + '</i>';
+      return '<div class="area" style="--ac:' + f.c + '"><div class="ah"><span>' + ic(f.icon) + '</span><b>' + names[f.k] + '</b></div><div class="pieces" role="img" aria-label="' + FITW[lvl] + '">' + pieces + '</div><span class="lv fl-' + lvl + '">' + FITW[lvl] + '</span><p class="hint" style="margin-top:8px">' + (lvl === "S" ? notes[f.k][0] : notes[f.k][1]) + '</p></div>';
+    }).join("");
+    var pat = [];
+    if (tags.complex) pat.push("You sometimes chose added departments or layers where the business did not need them. More structure helps only when scale and complexity justify it.");
+    if (tags.central) pat.push("You sometimes kept authority or approvals too centralized. Too much central control can create bottlenecks and slow routine or local decisions.");
+    if (tags.independent) pat.push("You sometimes gave units more independence than the business could coordinate. Too much local authority can weaken consistency and oversight.");
+    if (tags.sizeonly) pat.push("In the transfer challenge, you treated employee count as decisive. Size alone does not determine structural needs.");
+    if (!pat.length) pat.push("Across all four decisions, you avoided both unnecessary complexity and excessive control, choosing arrangements that matched each business's objective, scale, resources, and environment.");
+    var labels = ["Oak & Field", "Crestwell Home", "Aster Global", "Transfer challenge"];
+    var recap = all.map(function (o, i) { return '<div class="rc"><small>' + labels[i] + '</small><b>' + "ABC".charAt(S.picks[i]) + ': ' + o.t + '</b><em class="fl-' + o.overall + '">' + FITW[o.overall] + '</em></div>'; }).join("");
+
+    app.innerHTML = '<div class="stack">' +
+      '<section class="final-head ' + cat[1] + '"><small>Structural fit review</small><h1 tabindex="-1" id="title">' + cat[0] + '</h1><p>' + cat[2] + '</p></section>' +
+      '<div class="areas">' + areas + '</div>' +
+      '<section class="card pattern"><div class="eyebrow" style="margin-bottom:10px">The pattern in your decisions</div><ul>' + pat.map(function (p) { return "<li>" + p + "</li>"; }).join("") + '</ul></section>' +
+      '<section class="card"><div class="eyebrow" style="margin-bottom:10px">Your recommendations</div><div class="recap">' + recap + '</div></section>' +
+      '<div class="closing">' + ic("puzzle") + '<span><b>Structural effectiveness depends on fit, not complexity.</b> The strongest structure is the one that fits the organization\'s objectives, scale, resources, and operating environment.</span></div>' +
+      '<section class="card"><div class="row"><span class="hint">Try again to see how different recommendations change the fit.</span><button class="btn btn-alt" id="again" type="button">' + ic("restart") + ' Try Again</button></div></section>' +
+    '</div>';
+    document.getElementById("again").addEventListener("click", function () { reset(); go(0); });
+  }
+
+  /* ============ Navigation ============ */
+  function go(v) {
+    S.view = v; S.sel = null; S.locked = false;
+    renderLadder();
+    if (v === 0) renderIntro(); else if (v <= 3) renderCase(); else if (v === 4) renderTransfer(); else renderFinal();
+    try { window.scrollTo({ top: 0, behavior: "smooth" }); } catch (e) { window.scrollTo(0, 0); }
+    if (v !== 0) { var t = document.getElementById("title"); if (t) { try { t.focus({ preventScroll: true }); } catch (e2) { t.focus(); } } }
+  }
+
+  reset();
+  go(0);
+})();
+</script>
+</body>
+</html>
